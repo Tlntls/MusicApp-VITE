@@ -26,7 +26,7 @@ export default function Albums() {
   const albums = Array.from(uniqueAlbumsMap.values());
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 bg-main-bg text-text-light">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Albums ({albums.length})</h2>
       </div>
@@ -34,7 +34,7 @@ export default function Albums() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {albums.map((album) => (
             <Link key={album.id} to={`/album/${encodeURIComponent(album.id)}`}>
-              <Card className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col">
+              <div className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col bg-surface-bg rounded-lg">
                 <div className="relative aspect-square bg-gray-700">
                   <img
                     src={album.coverArtPath ? `file://${album.coverArtPath.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
@@ -42,11 +42,11 @@ export default function Albums() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <CardHeader className="p-4 flex-grow">
-                  <CardTitle className="truncate font-headline">{album.title}</CardTitle>
-                  <CardDescription className="truncate">{album.artist}</CardDescription>
-                </CardHeader>
-              </Card>
+                <div className="p-4 flex-grow">
+                  <div className="font-headline text-base truncate text-text-light">{album.title}</div>
+                  <div className="truncate text-sm text-text-light/80">{album.artist}</div>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

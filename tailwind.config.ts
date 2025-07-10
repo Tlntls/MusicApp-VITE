@@ -55,6 +55,11 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        'main-background': '#232136',
+        'accent-purple': '#a78bfa',
+        'main-bg': '#181825', // very dark background
+        'surface-bg': '#232136', // card/surface background
+        'text-light': '#e0e0e0',
       },
     },
   },

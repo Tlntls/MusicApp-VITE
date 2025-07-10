@@ -37,7 +37,7 @@ export default function ArtistDetail() {
   const artistCoverArt = songsByThisArtist.find(song => song.album?.cover)?.album?.cover;
 
   return (
-    <div className="p-4 md:p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-6 bg-main-bg text-text-light">
       <div className="flex flex-col md:flex-row items-center gap-8">
         <div className="w-32 h-32 md:w-48 md:h-48 shadow-lg">
           <Avatar className="w-full h-full">
@@ -61,7 +61,7 @@ export default function ArtistDetail() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {albumsByThisArtist.map((album) => (
             <Link key={album.id} to={`/album/${encodeURIComponent(album.id)}`}>
-              <Card className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col">
+              <div className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col bg-surface-bg rounded-lg">
                 <div className="relative aspect-square bg-gray-700">
                   <img
                     src={album.coverArtPath ? `file://${album.coverArtPath.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
@@ -69,10 +69,10 @@ export default function ArtistDetail() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <CardHeader className="p-4 flex-grow">
-                  <CardTitle className="truncate font-headline text-base">{album.title}</CardTitle>
-                </CardHeader>
-              </Card>
+                <div className="p-4 flex-grow">
+                  <div className="font-headline text-base truncate text-text-light">{album.title}</div>
+                </div>
+              </div>
             </Link>
           ))}
         </div>
@@ -86,7 +86,7 @@ export default function ArtistDetail() {
               coverSrc = song.album.cover;
             }
             return (
-              <div key={song.id} className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col group"
+              <div key={song.id} className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col group bg-surface-bg rounded-lg"
                 onClick={() => playItem(song, songsByThisArtist)}>
                 <div className="relative aspect-square bg-gray-700">
                   <img
@@ -102,7 +102,7 @@ export default function ArtistDetail() {
                 </div>
                 <div className="p-4 flex-grow">
                   <div className="font-headline text-sm" style={{ height: '2.8em', lineHeight: '1.4em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.title}</div>
-                  <div className="text-xs text-muted-foreground truncate w-full">{artistName}</div>
+                  <div className="text-xs text-text-light/80 truncate w-full">{artistName}</div>
                 </div>
               </div>
             );

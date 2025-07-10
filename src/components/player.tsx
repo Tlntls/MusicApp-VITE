@@ -22,10 +22,17 @@ export function Player() {
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(0.5);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [coverSrc, setCoverSrc] = useState('/placeholder-cover.png');
   
   // Ref to track the last played item to avoid sending duplicate events
   const lastPlayedId = useRef<string | null>(null);
+
+  // Get album cover for the active item
+  let coverSrc = '/placeholder-cover.png';
+  if (activeItem && isSong(activeItem) && activeItem.album?.cover) {
+    coverSrc = activeItem.album.cover;
+  } else if (activeItem && !isSong(activeItem) && activeItem?.audiobook?.cover) {
+    coverSrc = activeItem.audiobook.cover;
+  }
 
   // Effect to control the audio element's state and track plays
   useEffect(() => {
@@ -64,17 +71,6 @@ export function Player() {
     }
   }, [volume]);
 
-  // Effect to safely update the cover art source
-  useEffect(() => {
-    if (activeItem && isSong(activeItem) && activeItem?.album?.cover) {
-      setCoverSrc(activeItem.album.cover);
-    } else if (activeItem && !isSong(activeItem) && activeItem?.audiobook?.cover) {
-      setCoverSrc(activeItem.audiobook.cover);
-    } else {
-      setCoverSrc('/placeholder-cover.png');
-    }
-  }, [activeItem]);
-
   const handleTimeUpdate = () => { if (audioRef.current) setCurrentTime(audioRef.current.currentTime); };
   const handleSongEnd = () => { playNext(); };
 
@@ -101,7 +97,7 @@ export function Player() {
   
   if (!activeItem) {
     return (
-      <div className="h-24 border-t bg-background/95 backdrop-blur-sm flex items-center justify-center text-muted-foreground">
+      <div className="h-24 border-t flex items-center justify-center text-muted-foreground" style={{ background: '#232136', color: '#fff' }}>
         Select a song to start playing.
       </div>
     );
@@ -119,22 +115,28 @@ export function Player() {
   const progress = duration ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
+    <div className="w-full z-50" style={{ background: '#232136' }}>
       <audio 
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleSongEnd}
       />
       <div 
-        className="h-24 border-t bg-background/95 backdrop-blur-sm px-4 md:px-6 cursor-pointer"
+        className="h-24 border-t px-4 md:px-6 cursor-pointer"
+        style={{ background: '#232136', color: '#fff' }}
         onClick={handleContainerClick}
       >
         <div className="flex items-center h-full gap-4">
           <div className="flex items-center gap-4 w-1/4">
             <div 
-              className="h-14 w-14 rounded-md bg-gray-800 bg-cover bg-center flex-shrink-0"
-              style={{ backgroundImage: `url("${coverSrc}")` }}
+              className="h-14 w-14 rounded-md bg-gray-800 bg-cover bg-center flex-shrink-0 overflow-hidden"
             >
+              <img
+                src={coverSrc}
+                alt="Album Art"
+                className="w-full h-full object-cover"
+                onError={e => (e.currentTarget.src = '/placeholder-cover.png')}
+              />
             </div>
             <div>
               <p className="font-semibold truncate">{title}</p>
@@ -146,8 +148,8 @@ export function Player() {
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground"><Shuffle className="h-5 w-5" /></Button>
               <Button variant="ghost" size="icon" onClick={playPrevious}><SkipBack className="h-6 w-6" /></Button>
-              <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-accent hover:bg-accent/90" onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
-                {isPlaying ? <Pause className="h-6 w-6 fill-accent-foreground" /> : <Play className="h-6 w-6 fill-accent-foreground" />}
+              <Button size="icon" className="h-12 w-12 rounded-full" style={{ background: '#a78bfa', color: '#232136' }} onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
+                {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
               </Button>
               <Button variant="ghost" size="icon" onClick={playNext}><SkipForward className="h-6 w-6" /></Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground"><Repeat className="h-5 w-5" /></Button>

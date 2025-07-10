@@ -27,6 +27,7 @@ const PlayerContext = createContext<PlayerState | undefined>(undefined);
 const PLAY_HISTORY_KEY = 'recently_played_albums';
 
 function saveAlbumToHistory(album: Album) {
+  console.log('Saving album to history:', album);
   let history: Album[] = [];
   try {
     const raw = localStorage.getItem(PLAY_HISTORY_KEY);
@@ -71,14 +72,13 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
     setIsPlaying(true);
     // Record album play history if item is a Song
-    if ('album' in item && 'artist' in item.album) {
-      // Build Album object from Song
+    if ('album' in item && item.album && item.artist) {
       const album: Album = {
         id: item.album.id,
         title: item.album.title,
-        artist: item.artist,
+        artist: item.artist, // Use item.artist, not item.album.artist
         cover: item.album.cover,
-        songs: [], // Not needed for history
+        songs: [],
       };
       saveAlbumToHistory(album);
     }

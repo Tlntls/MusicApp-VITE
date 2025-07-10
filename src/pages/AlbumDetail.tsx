@@ -30,7 +30,7 @@ export default function AlbumDetail() {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-6 bg-main-bg text-text-light">
       <div className="flex flex-col md:flex-row items-center gap-8">
         <div className="w-32 h-32 md:w-48 md:h-48 shadow-lg">
           <img

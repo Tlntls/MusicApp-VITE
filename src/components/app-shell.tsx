@@ -71,17 +71,15 @@ function AppShellContent() {
       </SidebarContent>
       <SidebarFooter className="mt-auto">
         <div className="flex flex-col gap-2 p-2">
-          {/* This button now correctly calls the fetchSongs function from our context */}
-          <Button variant="outline" className="w-full justify-start" onClick={handleScanDbClick}>
+          <Button className="w-full justify-start bg-surface-bg text-text-light border-none hover:bg-accent-purple/20" onClick={handleScanDbClick}>
             <RefreshCw className="mr-2 h-4 w-4" /> Scan DB
           </Button>
-          {/* This button now correctly calls the startFolderScan function from our context */}
-          <Button variant="outline" className="w-full justify-start" onClick={handleAddFolderClick}>
+          <Button className="w-full justify-start bg-surface-bg text-text-light border-none hover:bg-accent-purple/20" onClick={handleAddFolderClick}>
             <FolderPlus className="mr-2 h-4 w-4" /> Add Folder
           </Button>
           <Dialog open={folderDialogOpen} onOpenChange={setFolderDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="w-full justify-start mt-2">
+              <Button className="w-full justify-start mt-2 bg-surface-bg text-text-light border-none hover:bg-accent-purple/20">
                 <Folder className="mr-2 h-4 w-4" /> Manage Folders
               </Button>
             </DialogTrigger>
@@ -142,17 +140,23 @@ function AppShellContent() {
   }
 
   return (
-      <div className="flex h-screen">
-        <Sidebar variant="sidebar" className="border-r">
+    <>
+      <div className="flex h-screen bg-main-bg w-full">
+        <Sidebar variant="sidebar" className="border-r z-20 bg-surface-bg text-text-light w-64" >
           {sidebarContent}
         </Sidebar>
-        <div className="flex flex-col flex-1">
-          <main className="flex-1 overflow-y-auto">
+        <div className="flex flex-col flex-1 w-full min-h-screen bg-main-bg text-text-light">
+          <main className="flex-1 w-full min-h-screen overflow-y-auto">
             <Outlet />
           </main>
-          {showPlayer && <Player />}
         </div>
       </div>
+      {showPlayer && (
+        <div className="fixed bottom-0 left-64 right-0 z-50">
+          <Player />
+        </div>
+      )}
+    </>
   );
 }
 

@@ -18,7 +18,7 @@ export default function Songs() {
   const sortedSongs = [...songs].sort((a, b) => a.title.localeCompare(b.title));
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 bg-main-bg text-text-light">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Songs ({sortedSongs.length})</h2>
       </div>
@@ -32,7 +32,7 @@ export default function Songs() {
               coverSrc = song.album.cover;
             }
             return (
-              <Card key={song.id} className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col group"
+              <div key={song.id} className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col group bg-surface-bg rounded-lg"
                 onClick={() => playItem(song, sortedSongs)}>
                 <div className="relative aspect-square bg-gray-700">
                   <img
@@ -46,11 +46,11 @@ export default function Songs() {
                     </div>
                   </div>
                 </div>
-                <CardHeader className="p-4 flex-grow">
-                  <CardTitle className="font-headline text-sm" style={{ height: '2.8em', lineHeight: '1.4em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.title}</CardTitle>
-                  <div className="text-xs text-muted-foreground truncate w-full">{song.artist?.name || 'Unknown Artist'}</div>
-                </CardHeader>
-              </Card>
+                <div className="p-4 flex-grow">
+                  <div className="font-headline text-sm" style={{ height: '2.8em', lineHeight: '1.4em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.title}</div>
+                  <div className="text-xs text-text-light/80 truncate w-full">{song.artist?.name || 'Unknown Artist'}</div>
+                </div>
+              </div>
             );
           })}
         </div>
