@@ -3,7 +3,9 @@ import { Card, CardHeader, CardTitle, CardDescription } from '../components/ui/c
 import { useMusic } from '../context/MusicContext';
 
 export default function Albums() {
-  const { songs, isLoading } = useMusic();
+  const { songs, folders, isLoading } = useMusic();
+  console.log('Albums page: songs', songs);
+  console.log('Albums page: folders', folders);
 
   if (isLoading) {
     return <div className="p-8 text-white">Loading albums...</div>;
@@ -11,13 +13,13 @@ export default function Albums() {
 
   const uniqueAlbumsMap = new Map();
   songs.forEach(song => {
-    const albumKey = `${song.album}|${song.artist}`;
+    const albumKey = `${song.album?.id}|${song.artist?.id}`;
     if (!uniqueAlbumsMap.has(albumKey) && song.album) {
       uniqueAlbumsMap.set(albumKey, {
         id: albumKey,
-        title: song.album,
-        artist: song.artist,
-        coverArtPath: song.coverArtPath
+        title: song.album?.title || song.album,
+        artist: song.artist?.name || song.artist,
+        coverArtPath: song.album?.cover || '/placeholder-cover.png',
       });
     }
   });

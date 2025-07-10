@@ -3,7 +3,7 @@
 'use client';
 
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react'; // Import useCallback
-import type { Song, Chapter } from '../lib/types';
+import type { Song, Chapter, Album } from '../lib/types';
 // We remove the mock data import as it's not needed here
 // import { songs as allSongs } from '../lib/mock-data'; 
 
@@ -23,6 +23,35 @@ interface PlayerState {
 
 const PlayerContext = createContext<PlayerState | undefined>(undefined);
 
+// Helper for persistent play history
+const PLAY_HISTORY_KEY = 'recently_played_albums';
+
+function saveAlbumToHistory(album: Album) {
+  let history: Album[] = [];
+  try {
+    const raw = localStorage.getItem(PLAY_HISTORY_KEY);
+    if (raw) history = JSON.parse(raw);
+  } catch {}
+  // Remove any previous occurrence of this album
+  history = history.filter(a => a.id !== album.id);
+  // Add to front
+  history.unshift(album);
+  // Limit to 50 for storage
+  if (history.length > 50) history = history.slice(0, 50);
+  localStorage.setItem(PLAY_HISTORY_KEY, JSON.stringify(history));
+}
+
+export function getRecentlyPlayedAlbums(limit = 10): Album[] {
+  try {
+    const raw = localStorage.getItem(PLAY_HISTORY_KEY);
+    if (!raw) return [];
+    const history: Album[] = JSON.parse(raw);
+    return history.slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [queue, setQueue] = useState<PlayableItem[]>([]);
   const [activeItem, setActiveItem] = useState<PlayableItem | null>(null);
@@ -41,6 +70,18 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setQueue([item]);
     }
     setIsPlaying(true);
+    // Record album play history if item is a Song
+    if ('album' in item && 'artist' in item.album) {
+      // Build Album object from Song
+      const album: Album = {
+        id: item.album.id,
+        title: item.album.title,
+        artist: item.artist,
+        cover: item.album.cover,
+        songs: [], // Not needed for history
+      };
+      saveAlbumToHistory(album);
+    }
   }, []);
   
   const addItemToQueueNext = useCallback((item: PlayableItem) => {

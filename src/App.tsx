@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Artists from './pages/Artists';
 import ArtistDetail from './pages/ArtistDetail';
@@ -15,41 +15,40 @@ import { MusicProvider } from './context/MusicContext';
 import { PlayerProvider } from './hooks/use-player-store';
 
 export default function App() {
-  console.log('App component loaded');
-  console.log('window.electronAPI:', window.electronAPI);
-  
+  // Remove all debug logs and banners
   // Test the ping function if available
   React.useEffect(() => {
     const api = window.electronAPI as any;
     if (api?.ping) {
-      console.log('Testing ping...');
       api.ping().then((result: any) => {
-        console.log('Ping result:', result);
+        // Optionally keep this log if you want to test ping
+        // console.log('Ping result:', result);
       }).catch((error: any) => {
-        console.error('Ping error:', error);
+        // console.error('Ping error:', error);
       });
     }
   }, []);
-  
+
   return (
-    <PlayerProvider>
+    <PlayerProvider key="player">
       <MusicProvider>
-        <BrowserRouter>
-          <AppShell>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/artists" element={<Artists />} />
-              <Route path="/artists/:id" element={<ArtistDetail />} />
-              <Route path="/albums" element={<Albums />} />
-              <Route path="/album/:id" element={<AlbumDetail />} />
-              <Route path="/songs" element={<Songs />} />
-              <Route path="/playlists" element={<Playlists />} />
-              <Route path="/audiobooks" element={<Audiobooks />} />
-              <Route path="/audiobooks/:id" element={<AudiobookDetail />} />
-              <Route path="/search" element={<Search />} />
-            </Routes>
-          </AppShell>
-        </BrowserRouter>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<AppShell />}>
+              <Route index element={<Home />} />
+              <Route path="artists" element={<Artists />} />
+              <Route path="artists/:id" element={<ArtistDetail />} />
+              <Route path="albums" element={<Albums />} />
+              <Route path="album/:id" element={<AlbumDetail />} />
+              <Route path="songs" element={<Songs />} />
+              <Route path="playlists" element={<Playlists />} />
+              <Route path="audiobooks" element={<Audiobooks />} />
+              <Route path="audiobooks/:id" element={<AudiobookDetail />} />
+              <Route path="search" element={<Search />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </HashRouter>
       </MusicProvider>
     </PlayerProvider>
   );

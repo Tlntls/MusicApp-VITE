@@ -4,27 +4,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Card, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Play, Music, Clock } from 'lucide-react';
+import { usePlayerStore } from '../hooks/use-player-store';
 
 export default function AlbumDetail() {
   const { id } = useParams();
   const albumId = decodeURIComponent(id || '');
   const { songs, isLoading } = useMusic();
+  const { playItem } = usePlayerStore();
 
   if (isLoading) {
     return <div className="p-8 text-white">Loading album details...</div>;
   }
 
-  const songsForThisAlbum = songs.filter(song => `${song.album}|${song.artist}` === albumId);
+  const songsForThisAlbum = songs.filter(song => `${song.album?.id}|${song.artist?.id}` === albumId);
 
   if (songsForThisAlbum.length === 0) {
     return <div className="p-8 text-white">Album not found or has no songs.</div>;
   }
 
   const album = {
-    title: songsForThisAlbum[0].album,
-    artist: { name: songsForThisAlbum[0].artist },
+    title: songsForThisAlbum[0].album?.title || '',
+    artist: { name: songsForThisAlbum[0].artist?.name || '' },
     songs: songsForThisAlbum,
-    cover: songsForThisAlbum[0].coverArtPath,
+    cover: songsForThisAlbum[0].album?.cover || '/placeholder-cover.png',
   };
 
   return (
@@ -55,7 +57,7 @@ export default function AlbumDetail() {
           </TableHeader>
           <TableBody>
             {album.songs.map((song, index) => (
-              <TableRow key={song.id} className="group cursor-pointer">
+              <TableRow key={song.id} className="group cursor-pointer" onClick={() => playItem(song, album.songs)}>
                 <TableCell className="font-medium text-muted-foreground">{index + 1}</TableCell>
                 <TableCell className="font-semibold">{song.title}</TableCell>
                 <TableCell className="text-right text-muted-foreground">{Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}</TableCell>

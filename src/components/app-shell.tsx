@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import { Library, Search, Music, Sparkles, Waves, PanelLeft, Users, ListMusic, ImageOff, BookOpen, FolderPlus, RefreshCw, Trash2, RefreshCw as RefreshIcon, Folder } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, useSidebar } from './ui/sidebar';
 import { Player } from './player';
@@ -29,13 +29,11 @@ const navGroups = [
   }
 ];
 
-function AppShellContent({ children }: { children: React.ReactNode }) {
+function AppShellContent() {
   const location = useLocation();
   const pathname = location.pathname;
   const { isMobile } = useSidebar();
   const showPlayer = pathname !== '/player';
-
-  // Get the functions from our central context!
   const { fetchSongs: handleScanDbClick, startFolderScan: handleAddFolderClick, folders, removeFolder, rescanFolder } = useMusic();
   const [folderDialogOpen, setFolderDialogOpen] = React.useState(false);
 
@@ -53,12 +51,19 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                 <p className="px-4 pt-4 pb-2 text-xs font-semibold text-muted-foreground">{group.title}</p>
                 {group.items.map((item) => (
                     <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
-                        <Link to={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
+                      {item.label === 'Artists' ? (
+                        <Link to={item.href} className="flex items-center gap-2 p-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                          <item.icon />
+                          <span>{item.label}</span>
                         </Link>
-                    </SidebarMenuButton>
+                      ) : (
+                        <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                          <Link to={item.href}>
+                            <item.icon />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      )}
                     </SidebarMenuItem>
                 ))}
             </SidebarMenu>
@@ -130,7 +135,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             </SheetContent>
           </Sheet>
         </header>
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto">{<Outlet />}</main>
         {showPlayer && <Player />}
       </div>
     );
@@ -143,7 +148,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         </Sidebar>
         <div className="flex flex-col flex-1">
           <main className="flex-1 overflow-y-auto">
-            {children}
+            <Outlet />
           </main>
           {showPlayer && <Player />}
         </div>
@@ -152,10 +157,10 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 }
 
 // This is the main component that this file exports for layout.tsx to use
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell() {
   return (
     <SidebarProvider>
-      <AppShellContent>{children}</AppShellContent>
+      <AppShellContent />
     </SidebarProvider>
   );
 }

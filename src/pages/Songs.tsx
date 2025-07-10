@@ -1,10 +1,15 @@
 import { useMusic } from '../context/MusicContext';
 import { Card, CardHeader, CardTitle } from '../components/ui/card';
 import { Play, Music } from 'lucide-react';
+import { usePlayerStore } from '../hooks/use-player-store';
 
 export default function Songs() {
-  const { songs, isLoading } = useMusic();
+  const { songs, folders, isLoading } = useMusic();
+  console.log('Songs page: songs', songs);
+  console.log('Songs page: folders', folders);
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI;
+
+  const { playItem } = usePlayerStore();
 
   if (isLoading) {
     return <div className="p-8 text-white">Loading songs...</div>;
@@ -27,7 +32,8 @@ export default function Songs() {
               coverSrc = song.album.cover;
             }
             return (
-              <Card key={song.id} className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col group">
+              <Card key={song.id} className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col group"
+                onClick={() => playItem(song, sortedSongs)}>
                 <div className="relative aspect-square bg-gray-700">
                   <img
                     src={coverSrc}

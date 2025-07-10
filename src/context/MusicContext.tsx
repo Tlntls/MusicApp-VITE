@@ -61,9 +61,21 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const fetchedSongs = await window.electronAPI!.fetchSongs();
-      setSongs(fetchedSongs);
+      console.log("Context: IPC fetchSongs returned:", fetchedSongs);
+      // Normalize songs to ensure correct structure
+      const normalizedSongs = fetchedSongs.map((song: any) => {
+        // If already normalized, return as is
+        if (typeof song.artist === 'object' && typeof song.album === 'object') return song;
+        // Otherwise, convert
+        return {
+          ...song,
+          artist: typeof song.artist === 'object' ? song.artist : { id: song.artist?.toLowerCase?.().replace(/\s+/g, '-') || song.artist || 'unknown', name: song.artist || 'Unknown Artist' },
+          album: typeof song.album === 'object' ? song.album : { id: song.album?.toLowerCase?.().replace(/\s+/g, '-') || song.album || 'unknown', title: song.album || 'Unknown Album', cover: song.coverArtPath || song.cover || '/placeholder-cover.png' },
+        };
+      });
+      setSongs(normalizedSongs);
       setError(null);
-      console.log("Context: Songs updated.", fetchedSongs);
+      console.log("Context: Songs updated.", normalizedSongs);
     } catch (error) {
       setError("Error fetching songs: " + (error instanceof Error ? error.message : String(error)));
       console.error("Context: Error fetching songs:", error);
@@ -73,12 +85,19 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchFolders = async () => {
-    if (!isElectron || !window.electronAPI) return;
+    console.log("Context: fetchFolders called");
+    if (!isElectron || !window.electronAPI) {
+      console.log("Context: Not in Electron, skipping fetchFolders.");
+      return;
+    }
     try {
       const fetchedFolders = await (window.electronAPI as any).fetchFolders();
+      console.log("Context: IPC fetchFolders returned:", fetchedFolders);
       setFolders(fetchedFolders);
+      console.log("Context: Folders updated.", fetchedFolders);
     } catch (error) {
       setFolders([]);
+      console.error("Context: Error fetching folders:", error);
     }
   };
 

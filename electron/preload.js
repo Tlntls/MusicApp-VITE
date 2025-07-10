@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Fetch songs from the main process
   fetchSongs: () => ipcRenderer.invoke('fetchSongs'),
+  fetchFolders: () => ipcRenderer.invoke('fetchFolders'),
   
   // Open folder dialog
   openFolderDialog: () => ipcRenderer.invoke('openFolderDialog'),

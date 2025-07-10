@@ -76,13 +76,18 @@ function scanFolderForAudioFiles(folderPath) {
 }
 
 function saveLibrary(db) {
+  console.log('Saving library to', DB_PATH);
+  console.log('Library data:', db);
   fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf-8');
 }
 
 function loadLibrary() {
   if (fs.existsSync(DB_PATH)) {
-    return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+    const data = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+    console.log('Loaded library from', DB_PATH, 'data:', data);
+    return data;
   }
+  console.log('No library found at', DB_PATH);
   return { folders: [], songs: [] };
 }
 
@@ -101,6 +106,7 @@ function cleanUnusedCovers(songs) {
 ipcMain.handle('fetchSongs', async () => {
   try {
     const db = loadLibrary();
+    console.log('IPC fetchSongs returning', db.songs.length, 'songs');
     return db.songs;
   } catch (error) {
     console.error('Error fetching songs:', error);
@@ -112,6 +118,7 @@ ipcMain.handle('fetchSongs', async () => {
 ipcMain.handle('fetchFolders', async () => {
   try {
     const db = loadLibrary();
+    console.log('IPC fetchFolders returning', db.folders.length, 'folders:', db.folders);
     return db.folders;
   } catch (error) {
     return [];
@@ -177,6 +184,7 @@ ipcMain.handle('addSongsFromFolder', async (event, folderPath) => {
     // Add folder if not present
     const folders = db.folders.includes(folderPath) ? db.folders : db.folders.concat([folderPath]);
     const newDb = { folders, songs: mergedSongs };
+    console.log('addSongsFromFolder: saving newDb', newDb);
     saveLibrary(newDb);
     cleanUnusedCovers(newDb.songs);
     mainWindow.webContents.send('scanProgress', '--- Scan Complete! ---');
