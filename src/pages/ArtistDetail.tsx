@@ -1,14 +1,17 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useMusic } from '../context/MusicContext';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Card, CardHeader, CardTitle } from '../components/ui/card';
 import { usePlayerStore } from '../hooks/use-player-store';
+import { Button } from '../components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 export default function ArtistDetail() {
   const { id } = useParams();
   const artistId = decodeURIComponent(id || '');
   const { songs, isLoading } = useMusic();
   const { playItem } = usePlayerStore();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <div className="p-8 text-white">Loading artist details...</div>;
@@ -34,25 +37,30 @@ export default function ArtistDetail() {
     }
   });
   const albumsByThisArtist = Array.from(uniqueAlbumsMap.values());
-  const artistCoverArt = songsByThisArtist.find(song => song.album?.cover)?.album?.cover;
+  // Pick a random album cover for the artist image on every render
+  let artistCoverArt = '/placeholder-cover.png';
+  if (albumsByThisArtist.length > 0) {
+    const randomIndex = Math.floor(Math.random() * albumsByThisArtist.length);
+    const randomAlbum = albumsByThisArtist[randomIndex];
+    if (randomAlbum.coverArtPath) {
+      artistCoverArt = `file://${randomAlbum.coverArtPath.replace(/\\/g, '/')}`;
+    }
+  }
 
   return (
     <div className="p-4 md:p-8 space-y-6 bg-main-bg text-text-light">
+      <Button variant="ghost" className="mb-4 flex items-center justify-center w-10 h-10 p-0" onClick={() => navigate(-1)}>
+        <ArrowLeft className="h-7 w-7 font-bold" strokeWidth={3} />
+      </Button>
       <div className="flex flex-col md:flex-row items-center gap-8">
-        <div className="w-32 h-32 md:w-48 md:h-48 shadow-lg">
-          <Avatar className="w-full h-full">
-            <AvatarImage asChild>
-              <img
-                src={artistCoverArt ? `file://${artistCoverArt.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
-                alt={`${artistName} portrait`}
-                className="object-cover"
-              />
-            </AvatarImage>
-            <AvatarFallback>{artistName.charAt(0)}</AvatarFallback>
-          </Avatar>
+        <div className="w-32 h-32 md:w-48 md:h-48 shadow-lg rounded-full overflow-hidden bg-gray-700 flex items-center justify-center">
+          <img
+            src={artistCoverArt}
+            alt={`${artistName} portrait`}
+            className="object-cover w-full h-full rounded-full"
+          />
         </div>
         <div className="text-center md:text-left">
-          <h2 className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Artist</h2>
           <h1 className="text-4xl md:text-6xl font-black font-headline tracking-tighter mt-1">{artistName}</h1>
         </div>
       </div>
@@ -77,38 +85,7 @@ export default function ArtistDetail() {
           ))}
         </div>
       </section>
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Songs</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {songsByThisArtist.map((song) => {
-            let coverSrc = '/placeholder-cover.png';
-            if (song.album?.cover) {
-              coverSrc = song.album.cover;
-            }
-            return (
-              <div key={song.id} className="w-full h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col group bg-surface-bg rounded-lg"
-                onClick={() => playItem(song, songsByThisArtist)}>
-                <div className="relative aspect-square bg-gray-700">
-                  <img
-                    src={coverSrc}
-                    className="w-full h-full object-cover"
-                  />
-                  {/* Play button overlay */}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
-                    <div className="bg-white bg-opacity-90 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <svg className="h-6 w-6 text-gray-900 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 flex-grow">
-                  <div className="font-headline text-sm" style={{ height: '2.8em', lineHeight: '1.4em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.title}</div>
-                  <div className="text-xs text-text-light/80 truncate w-full">{artistName}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      {/* Removed the Songs section below so only albums are shown */}
     </div>
   );
 } 

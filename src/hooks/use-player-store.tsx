@@ -19,6 +19,10 @@ interface PlayerState {
   playPrevious: () => void;
   setQueue: (items: PlayableItem[], startItem?: PlayableItem) => void;
   addItemToQueueNext: (item: PlayableItem) => void;
+  shuffle: boolean;
+  repeat: boolean;
+  toggleShuffle: () => void;
+  toggleRepeat: () => void;
 }
 
 const PlayerContext = createContext<PlayerState | undefined>(undefined);
@@ -57,20 +61,33 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [queue, setQueue] = useState<PlayableItem[]>([]);
   const [activeItem, setActiveItem] = useState<PlayableItem | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [shuffle, setShuffle] = useState<boolean>(false);
+  const [repeat, setRepeat] = useState<boolean>(false);
 
   const playItem = useCallback((item: PlayableItem, itemQueue: PlayableItem[] = []) => {
-    setActiveItem(item);
-    if (itemQueue.length > 0) {
+    setQueue(currentQueue => {
+      let newQueue = currentQueue;
+      if (itemQueue.length > 0) {
         const currentItemIndex = itemQueue.findIndex(s => s.id === item.id);
         if (currentItemIndex !== -1) {
-            setQueue(itemQueue.slice(currentItemIndex));
+          newQueue = itemQueue.slice(currentItemIndex);
         } else {
-            setQueue(itemQueue);
+          newQueue = itemQueue;
         }
-    } else {
-      setQueue([item]);
-    }
+      } else {
+        newQueue = [item];
+      }
+      return newQueue;
+    });
     setIsPlaying(true);
+    setActiveItem(current => {
+      if (current && current.id === item.id) {
+        // If already playing this item, just resume
+        return current;
+      }
+      // Otherwise, set new item
+      return item;
+    });
     // Record album play history if item is a Song
     if ('album' in item && item.album && item.artist) {
       const album: Album = {
@@ -120,27 +137,52 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [activeItem, queue]);
 
+  const toggleShuffle = useCallback(() => setShuffle(s => !s), []);
+  const toggleRepeat = useCallback(() => setRepeat(r => !r), []);
+
   const playNext = useCallback(() => {
     if (!activeItem) return;
     const currentIndex = queue.findIndex(s => s.id === activeItem.id);
-    if (currentIndex !== -1 && currentIndex < queue.length - 1) {
+    if (shuffle && queue.length > 1) {
+      // Pick a random next song that isn't the current one
+      let nextIndex = currentIndex;
+      while (nextIndex === currentIndex && queue.length > 1) {
+        nextIndex = Math.floor(Math.random() * queue.length);
+      }
+      setActiveItem(queue[nextIndex]);
+      setIsPlaying(true);
+    } else if (currentIndex !== -1 && currentIndex < queue.length - 1) {
       const nextIndex = currentIndex + 1;
       setActiveItem(queue[nextIndex]);
+      setIsPlaying(true);
+    } else if (repeat && queue.length > 0) {
+      setActiveItem(queue[0]);
       setIsPlaying(true);
     } else {
       setIsPlaying(false);
     }
-  }, [activeItem, queue]);
+  }, [activeItem, queue, shuffle, repeat]);
 
   const playPrevious = useCallback(() => {
     if (!activeItem) return;
     const currentIndex = queue.findIndex(s => s.id === activeItem.id);
-    if (currentIndex > 0) {
+    if (shuffle && queue.length > 1) {
+      // Pick a random previous song that isn't the current one
+      let prevIndex = currentIndex;
+      while (prevIndex === currentIndex && queue.length > 1) {
+        prevIndex = Math.floor(Math.random() * queue.length);
+      }
+      setActiveItem(queue[prevIndex]);
+      setIsPlaying(true);
+    } else if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
       setActiveItem(queue[prevIndex]);
       setIsPlaying(true);
+    } else if (repeat && queue.length > 0) {
+      setActiveItem(queue[queue.length - 1]);
+      setIsPlaying(true);
     }
-  }, [activeItem, queue]);
+  }, [activeItem, queue, shuffle, repeat]);
 
   // The value provided to the context now contains the stable functions
   const value = {
@@ -153,6 +195,10 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     playPrevious,
     setQueue: setItemsAndPlay,
     addItemToQueueNext,
+    shuffle,
+    repeat,
+    toggleShuffle,
+    toggleRepeat,
   };
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;

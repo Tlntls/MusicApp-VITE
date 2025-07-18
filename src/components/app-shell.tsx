@@ -146,7 +146,7 @@ function AppShellContent() {
           {sidebarContent}
         </Sidebar>
         <div className="flex flex-col flex-1 w-full min-h-screen bg-main-bg text-text-light">
-          <main className="flex-1 w-full min-h-screen overflow-y-auto">
+          <main className="flex-1 w-full min-h-screen overflow-y-auto" style={{ paddingBottom: '7rem' }}>
             <Outlet />
           </main>
         </div>

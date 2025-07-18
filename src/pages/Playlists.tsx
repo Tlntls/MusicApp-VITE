@@ -16,13 +16,7 @@ export default function Playlists() {
     <div className="p-4 md:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Playlists</h1>
-        <div className="flex items-center gap-2">
-          <CreatePlaylistDialog onPlaylistCreated={handlePlaylistCreated} />
-          <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <Sparkles className="mr-2 h-4 w-4" />
-            Create with AI
-          </Button>
-        </div>
+        <CreatePlaylistDialog onPlaylistCreated={handlePlaylistCreated} />
       </div>
       {playlists.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

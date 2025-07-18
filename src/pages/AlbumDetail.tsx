@@ -1,9 +1,9 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useMusic } from '../context/MusicContext';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Card, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Play, Music, Clock } from 'lucide-react';
+import { Play, Music, Clock, ArrowLeft } from 'lucide-react';
 import { usePlayerStore } from '../hooks/use-player-store';
 
 export default function AlbumDetail() {
@@ -11,6 +11,7 @@ export default function AlbumDetail() {
   const albumId = decodeURIComponent(id || '');
   const { songs, isLoading } = useMusic();
   const { playItem } = usePlayerStore();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <div className="p-8 text-white">Loading album details...</div>;
@@ -31,6 +32,9 @@ export default function AlbumDetail() {
 
   return (
     <div className="p-4 md:p-8 space-y-6 bg-main-bg text-text-light">
+      <Button variant="ghost" className="mb-4 flex items-center justify-center w-10 h-10 p-0" onClick={() => navigate(-1)}>
+        <ArrowLeft className="h-7 w-7 font-bold" strokeWidth={3} />
+      </Button>
       <div className="flex flex-col md:flex-row items-center gap-8">
         <div className="w-32 h-32 md:w-48 md:h-48 shadow-lg">
           <img
@@ -40,27 +44,33 @@ export default function AlbumDetail() {
           />
         </div>
         <div className="text-center md:text-left">
-          <h2 className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Album</h2>
           <h1 className="text-4xl md:text-6xl font-black font-headline tracking-tighter mt-1">{album.title}</h1>
           <h3 className="text-lg font-semibold mt-2">{album.artist.name}</h3>
         </div>
       </div>
       <section>
-        <h3 className="text-xl font-semibold mb-4">Songs</h3>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Title</TableHead>
+              <TableHead>Track</TableHead>
               <TableHead className="text-right"><Clock className="inline-block h-4 w-4" /></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {album.songs.map((song, index) => (
-              <TableRow key={song.id} className="group cursor-pointer" onClick={() => playItem(song, album.songs)}>
-                <TableCell className="font-medium text-muted-foreground">{index + 1}</TableCell>
-                <TableCell className="font-semibold">{song.title}</TableCell>
-                <TableCell className="text-right text-muted-foreground">{Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}</TableCell>
+              <TableRow
+                key={song.id}
+                className={`group cursor-pointer transition-colors duration-150 ${index % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30`}
+                onClick={() => playItem(song, album.songs)}
+              >
+                <TableCell className="flex items-center gap-2 font-semibold">
+                  <span className="text-muted-foreground w-6 text-right transition-opacity duration-100 group-hover:opacity-0">{index + 1}</span>
+                  <span className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-100">
+                    <Play className="h-5 w-5 text-accent" />
+                  </span>
+                  <span className="ml-2">{song.title}</span>
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground font-mono">{Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}</TableCell>
               </TableRow>
             ))}
           </TableBody>
