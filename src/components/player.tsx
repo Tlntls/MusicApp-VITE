@@ -143,7 +143,7 @@ export function Player() {
         <div className="flex items-center h-full gap-4">
           <div className="flex items-center gap-4 w-1/4">
             <div 
-              className="h-14 w-14 rounded-md bg-gray-800 bg-cover bg-center flex-shrink-0 overflow-hidden cursor-pointer"
+              className="h-14 w-14 aspect-square rounded-md bg-gray-800 bg-cover bg-center flex-shrink-0 overflow-hidden cursor-pointer"
               onClick={() => setExpanded(true)}
             >
               <img
@@ -198,7 +198,7 @@ export function Player() {
         ×
       </button>
       <div className="flex flex-col md:flex-row items-center gap-12 p-8 w-full max-w-5xl">
-        <div className="w-96 h-96 rounded-lg overflow-hidden shadow-2xl bg-gray-800 flex-shrink-0">
+        <div className="w-96 h-96 min-w-[120px] min-h-[120px] aspect-square rounded-lg overflow-hidden shadow-2xl bg-gray-800 flex-shrink-0">
           <img
             src={coverSrc}
             alt="Album Art Large"

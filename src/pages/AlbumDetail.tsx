@@ -5,6 +5,15 @@ import { Card, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Play, Music, Clock, ArrowLeft } from 'lucide-react';
 import { usePlayerStore } from '../hooks/use-player-store';
+import { SongActions } from '../components/song-actions';
+
+type AlbumWithYear = {
+  title: string;
+  artist: { name: string };
+  cover: string;
+  year?: number;
+  songs: any[];
+};
 
 export default function AlbumDetail() {
   const { id } = useParams();
@@ -23,11 +32,12 @@ export default function AlbumDetail() {
     return <div className="p-8 text-white">Album not found or has no songs.</div>;
   }
 
-  const album = {
-    title: songsForThisAlbum[0].album?.title || '',
-    artist: { name: songsForThisAlbum[0].artist?.name || '' },
+  const album: AlbumWithYear = {
+    title: songsForThisAlbum[0].album.title,
+    artist: { name: songsForThisAlbum[0].artist.name },
+    cover: songsForThisAlbum[0].album.cover,
+    year: songsForThisAlbum[0].album.year,
     songs: songsForThisAlbum,
-    cover: songsForThisAlbum[0].album?.cover || '/placeholder-cover.png',
   };
 
   return (
@@ -36,7 +46,7 @@ export default function AlbumDetail() {
         <ArrowLeft className="h-7 w-7 font-bold" strokeWidth={3} />
       </Button>
       <div className="flex flex-col md:flex-row items-center gap-8">
-        <div className="w-32 h-32 md:w-48 md:h-48 shadow-lg">
+        <div className="w-[160px] h-[160px] md:w-[200px] md:h-[200px] shadow-lg min-w-[120px] min-h-[120px] flex items-center justify-center overflow-hidden rounded-lg">
           <img
             src={album.cover ? `file://${album.cover.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
             alt={`${album.title} cover`}
@@ -46,6 +56,7 @@ export default function AlbumDetail() {
         <div className="text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-black font-headline tracking-tighter mt-1">{album.title}</h1>
           <h3 className="text-lg font-semibold mt-2">{album.artist.name}</h3>
+          {album.year && <div className="text-xs text-muted-foreground">{album.year}</div>}
         </div>
       </div>
       <section>
@@ -69,6 +80,7 @@ export default function AlbumDetail() {
                     <Play className="h-5 w-5 text-accent" />
                   </span>
                   <span className="ml-2">{song.title}</span>
+                  <span className="ml-auto"><SongActions song={song} /></span>
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground font-mono">{Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}</TableCell>
               </TableRow>

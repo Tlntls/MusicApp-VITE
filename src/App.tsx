@@ -7,6 +7,7 @@ import Albums from './pages/Albums';
 import AlbumDetail from './pages/AlbumDetail';
 import Songs from './pages/Songs';
 import Playlists from './pages/Playlists';
+import PlaylistDetail from './pages/PlaylistDetail';
 import Audiobooks from './pages/Audiobooks';
 import AudiobookDetail from './pages/AudiobookDetail';
 import Search from './pages/Search';
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="album/:id" element={<AlbumDetail />} />
               <Route path="songs" element={<Songs />} />
               <Route path="playlists" element={<Playlists />} />
+              <Route path="playlists/:id" element={<PlaylistDetail />} />
               <Route path="audiobooks" element={<Audiobooks />} />
               <Route path="audiobooks/:id" element={<AudiobookDetail />} />
               <Route path="search" element={<Search />} />

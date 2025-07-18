@@ -64,13 +64,36 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       console.log("Context: IPC fetchSongs returned:", fetchedSongs);
       // Normalize songs to ensure correct structure
       const normalizedSongs = fetchedSongs.map((song: any) => {
-        // If already normalized, return as is
-        if (typeof song.artist === 'object' && typeof song.album === 'object') return song;
-        // Otherwise, convert
+        // Normalize artist
+        let artist = song.artist;
+        if (typeof artist !== 'object' || !artist.id || !artist.name) {
+          const artistName = typeof artist === 'string' ? artist : (artist?.name || 'Unknown Artist');
+          artist = {
+            id: artistName?.toLowerCase?.().replace(/\s+/g, '-') || 'unknown',
+            name: artistName || 'Unknown Artist',
+          };
+        }
+        // Normalize album
+        let album = song.album;
+        if (typeof album !== 'object' || !album.id || !album.title) {
+          const albumTitle = typeof album === 'string' ? album : (album?.title || 'Unknown Album');
+          album = {
+            id: albumTitle?.toLowerCase?.().replace(/\s+/g, '-') || 'unknown',
+            title: albumTitle || 'Unknown Album',
+            cover: album?.coverArtPath || album?.cover || '/placeholder-cover.png',
+          };
+        } else {
+          album = {
+            id: album.id,
+            title: album.title,
+            cover: album.cover || '/placeholder-cover.png',
+            year: album.year ?? undefined,
+          };
+        }
         return {
           ...song,
-          artist: typeof song.artist === 'object' ? song.artist : { id: song.artist?.toLowerCase?.().replace(/\s+/g, '-') || song.artist || 'unknown', name: song.artist || 'Unknown Artist' },
-          album: typeof song.album === 'object' ? song.album : { id: song.album?.toLowerCase?.().replace(/\s+/g, '-') || song.album || 'unknown', title: song.album || 'Unknown Album', cover: song.coverArtPath || song.cover || '/placeholder-cover.png' },
+          artist,
+          album,
         };
       });
       setSongs(normalizedSongs);

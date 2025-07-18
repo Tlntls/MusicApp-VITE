@@ -15,12 +15,17 @@ import { Button } from "./ui/button";
 import { MoreHorizontal, PlusCircle, ListPlus } from "lucide-react";
 import type { Song } from "../lib/types";
 import { usePlayerStore } from "../hooks/use-player-store";
-import { playlists } from "../lib/mock-data";
+import { usePlaylists } from '../context/PlaylistContext';
+import { useState } from 'react';
 import { useToast } from "../hooks/use-toast";
 
 export function SongActions({ song }: { song: Song }) {
   const { addItemToQueueNext } = usePlayerStore();
   const { toast } = useToast();
+  const { playlists, addSongToPlaylist, addPlaylist } = usePlaylists();
+  const [showCreate, setShowCreate] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [open, setOpen] = useState(false);
 
   const handleAddToQueue = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -33,28 +38,34 @@ export function SongActions({ song }: { song: Song }) {
   
   const handleAddToPlaylist = (e: React.MouseEvent, playlistId: string) => {
     e.stopPropagation();
-    // In a real app, this would be an API call.
-    // Here we are modifying mock data.
+    addSongToPlaylist(playlistId, song);
     const playlist = playlists.find(p => p.id === playlistId);
-    if (playlist) {
-      // Avoid adding duplicates
-      if (!playlist.songs.find(s => s.id === song.id)) {
-        playlist.songs.push(song);
-        toast({
-          title: "Song Added",
-          description: `"${song.title}" was added to "${playlist.name}".`,
-        });
-      } else {
-        toast({
-          title: "Already in playlist",
-          description: `"${song.title}" is already in "${playlist.name}".`,
-        });
-      }
-    }
+    toast({
+      title: playlist ? `Song Added` : 'Song Added',
+      description: playlist ? `"${song.title}" was added to "${playlist.name}".` : `Song added to playlist.`,
+    });
+  };
+
+  const handleCreatePlaylist = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPlaylistName.trim()) return;
+    const newPlaylist = {
+      id: `playlist-${Date.now()}`,
+      name: newPlaylistName.trim(),
+      songs: [song],
+    };
+    addPlaylist(newPlaylist);
+    toast({
+      title: 'Playlist Created',
+      description: `"${newPlaylist.name}" has been created and the song was added.`,
+    });
+    setShowCreate(false);
+    setNewPlaylistName('');
+    setOpen(false);
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={(v) => { setOpen(v); if (!v) setShowCreate(false); }}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
           <MoreHorizontal className="h-4 w-4" />
@@ -79,7 +90,25 @@ export function SongActions({ song }: { song: Song }) {
                 {playlist.name}
               </DropdownMenuItem>
             ))}
-            {playlists.length === 0 && <DropdownMenuItem disabled>No playlists found</DropdownMenuItem>}
+            <DropdownMenuSeparator />
+            {showCreate ? (
+              <form onSubmit={handleCreatePlaylist} className="flex flex-col gap-2 p-2">
+                <input
+                  autoFocus
+                  className="border rounded px-2 py-1 text-sm bg-background text-foreground"
+                  placeholder="Playlist name"
+                  value={newPlaylistName}
+                  onChange={e => setNewPlaylistName(e.target.value)}
+                  onClick={e => e.stopPropagation()}
+                />
+                <button type="submit" className="bg-accent text-accent-foreground rounded px-2 py-1 text-xs">Create</button>
+              </form>
+            ) : (
+              <DropdownMenuItem onSelect={e => { e.preventDefault(); setShowCreate(true); }}>
+                + Create new playlist
+              </DropdownMenuItem>
+            )}
+            {playlists.length === 0 && !showCreate && <DropdownMenuItem disabled>No playlists found</DropdownMenuItem>}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       </DropdownMenuContent>

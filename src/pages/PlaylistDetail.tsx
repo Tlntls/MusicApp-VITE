@@ -1,43 +1,34 @@
-import { useMusic } from '../context/MusicContext';
-import { Card, CardHeader, CardTitle } from '../components/ui/card';
-import { Play, Music } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { usePlaylists } from '../context/PlaylistContext';
+import { Play } from 'lucide-react';
 import { usePlayerStore } from '../hooks/use-player-store';
-import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { SongActions } from '../components/song-actions';
 
-export default function Songs() {
-  const { songs, folders, isLoading } = useMusic();
-  console.log('Songs page: songs', songs);
-  console.log('Songs page: folders', folders);
-  const isElectron = typeof window !== 'undefined' && !!window.electronAPI;
-
+export default function PlaylistDetail() {
+  const { id } = useParams();
+  const { playlists } = usePlaylists();
   const { playItem } = usePlayerStore();
-  const [contextMenuIdx, setContextMenuIdx] = useState<number | null>(null);
+  const playlist = playlists.find(p => p.id === id);
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
-  if (isLoading) {
-    return <div className="p-8 text-white">Loading songs...</div>;
+  if (!playlist) {
+    return <div className="p-8 text-white">Playlist not found.</div>;
   }
-
-  const sortedSongs = [...songs].sort((a, b) => a.title.localeCompare(b.title));
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 bg-main-bg text-text-light">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Songs ({sortedSongs.length})</h2>
-      </div>
-      <section>
-        <div className="divide-y divide-border rounded-lg overflow-hidden">
-          {sortedSongs.map((song, idx) => (
+      <h1 className="text-3xl font-bold mb-4">{playlist.name}</h1>
+      <div className="divide-y divide-border rounded-lg overflow-hidden">
+        {playlist.songs.length === 0 ? (
+          <div className="text-muted-foreground p-4">No songs in this playlist yet.</div>
+        ) : (
+          playlist.songs.map((song, idx) => (
             <div
               key={song.id}
               className={`flex items-center px-4 py-3 cursor-pointer group transition-colors duration-150 ${idx % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30`}
-              onClick={() => playItem(song, sortedSongs)}
-              onContextMenu={e => {
-                e.preventDefault();
-                setContextMenuIdx(idx);
-              }}
-              onMouseLeave={() => setContextMenuIdx(null)}
+              onClick={() => playItem(song, playlist.songs)}
+              onMouseEnter={() => setHoverIdx(idx)}
+              onMouseLeave={() => setHoverIdx(null)}
             >
               <div className="w-8 flex items-center justify-center">
                 <span className="text-muted-foreground text-lg font-mono transition-opacity duration-100 group-hover:opacity-0">{idx + 1}</span>
@@ -64,15 +55,10 @@ export default function Songs() {
               <div className="w-16 text-right text-muted-foreground font-mono">
                 {Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}
               </div>
-              {contextMenuIdx === idx && (
-                <div style={{ position: 'absolute', zIndex: 1000, right: 40, top: '100%' }}>
-                  <SongActions song={song} />
-                </div>
-              )}
             </div>
-          ))}
-        </div>
-      </section>
+          ))
+        )}
+      </div>
     </div>
   );
 } 

@@ -1,16 +1,14 @@
-import { useState } from 'react';
+import { usePlaylists } from '../context/PlaylistContext';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Music, Sparkles } from 'lucide-react';
 import { CreatePlaylistDialog } from '../components/create-playlist-dialog';
+import { useNavigate } from 'react-router-dom';
 
 export default function Playlists() {
-  // Placeholder for playlists state
-  const [playlists, setPlaylists] = useState<any[]>([]);
-
-  const handlePlaylistCreated = (playlist: any) => {
-    setPlaylists((prev) => [...prev, playlist]);
-  };
+  const { playlists, addPlaylist } = usePlaylists();
+  const handlePlaylistCreated = addPlaylist;
+  const navigate = useNavigate();
 
   return (
     <div className="p-4 md:p-8 space-y-6">
@@ -37,7 +35,7 @@ export default function Playlists() {
                 <p className="text-sm text-muted-foreground line-clamp-2">{playlist.description}</p>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full">View Playlist</Button>
+                <Button variant="outline" className="w-full" onClick={() => navigate(`/playlists/${playlist.id}`)}>View Playlist</Button>
               </CardFooter>
             </Card>
           ))}
