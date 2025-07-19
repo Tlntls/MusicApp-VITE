@@ -22,16 +22,16 @@ export default function Songs() {
   const sortedSongs = [...songs].sort((a, b) => a.title.localeCompare(b.title));
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 bg-main-bg text-text-light">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Songs ({sortedSongs.length})</h2>
+    <div className="flex-1 space-y-3 p-3 md:p-5 pt-4 bg-main-bg text-text-light">
+      <div className="flex items-center justify-between space-y-1">
+        <h2 className="text-lg font-semibold tracking-tight">Songs ({sortedSongs.length})</h2>
       </div>
       <section>
         <div className="divide-y divide-border rounded-lg overflow-hidden">
           {sortedSongs.map((song, idx) => (
             <div
               key={song.id}
-              className={`flex items-center px-4 py-3 cursor-pointer group transition-colors duration-150 ${idx % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30`}
+              className={`flex items-center px-3 py-1.5 cursor-pointer group transition-colors duration-150 text-sm ${idx % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30`}
               onClick={() => playItem(song, sortedSongs)}
               onContextMenu={e => {
                 e.preventDefault();
@@ -39,14 +39,14 @@ export default function Songs() {
               }}
               onMouseLeave={() => setContextMenuIdx(null)}
             >
-              <div className="w-8 flex items-center justify-center">
-                <span className="text-muted-foreground text-lg font-mono transition-opacity duration-100 group-hover:opacity-0">{idx + 1}</span>
+              <div className="w-6 flex items-center justify-center">
+                <span className="text-muted-foreground text-base font-mono transition-opacity duration-100 group-hover:opacity-0">{idx + 1}</span>
                 <span className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-100">
-                  <Play className="h-5 w-5 text-accent" />
+                  <Play className="h-4 w-4 text-accent" />
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-headline text-base truncate">{song.title}</div>
+                <div className="font-headline text-sm truncate font-semibold">{song.title}</div>
                 <div className="text-xs text-text-light/80 truncate">
                   {song.artist?.id ? (
                     <Link
@@ -61,7 +61,7 @@ export default function Songs() {
                   )}
                 </div>
               </div>
-              <div className="w-16 text-right text-muted-foreground font-mono">
+              <div className="w-12 text-right text-xs text-muted-foreground font-mono">
                 {Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}
               </div>
               {contextMenuIdx === idx && (

@@ -71,6 +71,10 @@
       "target": "nsis",
       "icon": "electron/assets/icon.ico"
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "mac": {
       "target": "dmg",
       "icon": "electron/assets/icon.icns"

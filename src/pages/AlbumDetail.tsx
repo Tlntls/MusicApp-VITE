@@ -41,21 +41,21 @@ export default function AlbumDetail() {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-main-bg text-text-light">
-      <Button variant="ghost" className="mb-4 flex items-center justify-center w-10 h-10 p-0" onClick={() => navigate(-1)}>
-        <ArrowLeft className="h-7 w-7 font-bold" strokeWidth={3} />
+    <div className="p-3 md:p-5 space-y-4 bg-main-bg text-text-light">
+      <Button variant="ghost" className="mb-2 flex items-center justify-center w-8 h-8 p-0" onClick={() => navigate(-1)}>
+        <ArrowLeft className="h-5 w-5 font-bold" strokeWidth={2} />
       </Button>
-      <div className="flex flex-col md:flex-row items-center gap-8">
-        <div className="w-[160px] h-[160px] md:w-[200px] md:h-[200px] shadow-lg min-w-[120px] min-h-[120px] flex items-center justify-center overflow-hidden rounded-lg">
+      <div className="flex flex-col md:flex-row items-center gap-4">
+        <div className="w-[100px] h-[100px] md:w-[140px] md:h-[140px] shadow-lg min-w-[80px] min-h-[80px] flex items-center justify-center overflow-hidden rounded-lg">
           <img
             src={album.cover ? `file://${album.cover.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
             alt={`${album.title} cover`}
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full rounded-md"
           />
         </div>
         <div className="text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl font-black font-headline tracking-tighter mt-1">{album.title}</h1>
-          <h3 className="text-lg font-semibold mt-2">{album.artist.name}</h3>
+          <h1 className="text-xl md:text-2xl font-bold font-headline tracking-tight mt-1">{album.title}</h1>
+          <h3 className="text-sm font-medium mt-1">{album.artist.name}</h3>
           {album.year && <div className="text-xs text-muted-foreground">{album.year}</div>}
         </div>
       </div>
@@ -63,26 +63,26 @@ export default function AlbumDetail() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Track</TableHead>
-              <TableHead className="text-right"><Clock className="inline-block h-4 w-4" /></TableHead>
+              <TableHead className="text-xs">Track</TableHead>
+              <TableHead className="text-right text-xs"><Clock className="inline-block h-3 w-3" /></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {album.songs.map((song, index) => (
               <TableRow
                 key={song.id}
-                className={`group cursor-pointer transition-colors duration-150 ${index % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30`}
+                className={`group cursor-pointer transition-colors duration-150 text-sm ${index % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30`}
                 onClick={() => playItem(song, album.songs)}
               >
-                <TableCell className="flex items-center gap-2 font-semibold">
-                  <span className="text-muted-foreground w-6 text-right transition-opacity duration-100 group-hover:opacity-0">{index + 1}</span>
+                <TableCell className="flex items-center gap-2 font-semibold py-1 px-2">
+                  <span className="text-muted-foreground w-5 text-right transition-opacity duration-100 group-hover:opacity-0 text-base">{index + 1}</span>
                   <span className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-100">
-                    <Play className="h-5 w-5 text-accent" />
+                    <Play className="h-4 w-4 text-accent" />
                   </span>
-                  <span className="ml-2">{song.title}</span>
+                  <span className="ml-2 truncate text-sm">{song.title}</span>
                   <span className="ml-auto"><SongActions song={song} /></span>
                 </TableCell>
-                <TableCell className="text-right text-muted-foreground font-mono">{Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}</TableCell>
+                <TableCell className="text-right text-xs text-muted-foreground font-mono">{Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}</TableCell>
               </TableRow>
             ))}
           </TableBody>

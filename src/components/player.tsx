@@ -130,58 +130,56 @@ export function Player() {
 
   // The compact player bar
   const playerBar = (
-    <div className="w-full z-50" style={{ background: '#232136' }}>
+    <div className="fixed bottom-0 left-0 right-0 w-full z-50 bg-[#232136] border-t border-border shadow-lg flex flex-col" style={{ borderRadius: 0 }}>
       <audio 
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleSongEnd}
       />
       <div 
-        className="h-24 border-t px-4 md:px-6"
-        style={{ background: '#232136', color: '#fff' }}
+        className="h-24 px-4 md:px-6 flex items-center gap-4 w-full"
+        style={{ color: '#fff' }}
       >
-        <div className="flex items-center h-full gap-4">
-          <div className="flex items-center gap-4 w-1/4">
-            <div 
-              className="h-14 w-14 aspect-square rounded-md bg-gray-800 bg-cover bg-center flex-shrink-0 overflow-hidden cursor-pointer"
-              onClick={() => setExpanded(true)}
-            >
-              <img
-                src={coverSrc}
-                alt="Album Art"
-                className="w-full h-full object-cover"
-                onError={e => (e.currentTarget.src = '/placeholder-cover.png')}
-              />
-            </div>
-            <div>
-              <p className="font-semibold truncate">{title}</p>
-              <p className="text-sm text-muted-foreground truncate">{subtitle}</p>
-            </div>
+        <div className="flex items-center gap-4 w-1/4 min-w-0">
+          <div 
+            className="h-14 w-14 aspect-square rounded-md bg-gray-800 bg-cover bg-center flex-shrink-0 overflow-hidden cursor-pointer"
+            onClick={() => setExpanded(true)}
+          >
+            <img
+              src={coverSrc}
+              alt="Album Art"
+              className="w-full h-full object-cover"
+              onError={e => (e.currentTarget.src = '/placeholder-cover.png')}
+            />
           </div>
-          <div className="flex flex-col items-center justify-center gap-2 flex-1">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className={shuffle ? 'text-accent bg-accent/20' : 'text-muted-foreground hover:text-foreground'} onClick={toggleShuffle} aria-pressed={shuffle} title="Shuffle">
-                <Shuffle className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={playPrevious}><SkipBack className="h-6 w-6" /></Button>
-              <Button size="icon" className="h-12 w-12 rounded-full" style={{ background: '#a78bfa', color: '#232136' }} onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
-                {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
-              </Button>
-              <Button variant="ghost" size="icon" onClick={playNext}><SkipForward className="h-6 w-6" /></Button>
-              <Button variant="ghost" size="icon" className={repeat ? 'text-accent bg-accent/20' : 'text-muted-foreground hover:text-foreground'} onClick={toggleRepeat} aria-pressed={repeat} title="Repeat">
-                <Repeat className="h-5 w-5" />
-              </Button>
-            </div>
-            <div className="flex items-center gap-2 w-full max-w-lg">
-              <span className="text-xs text-muted-foreground tabular-nums">{formatTime(currentTime)}</span>
-              <Slider value={[progress]} max={100} step={1} onValueChange={handleSeek} className="flex-1" />
-              <span className="text-xs text-muted-foreground tabular-nums">{formatTime(duration)}</span>
-            </div>
+          <div className="min-w-0">
+            <p className="font-semibold truncate">{title}</p>
+            <p className="text-sm text-muted-foreground truncate">{subtitle}</p>
           </div>
-          <div className="flex items-center gap-2 w-1/4 justify-end">
-            <Volume2 className="h-5 w-5 text-muted-foreground" />
-            <Slider value={[volume * 100]} max={100} step={1} onValueChange={handleVolumeChange} className="w-24" />
+        </div>
+        <div className="flex flex-col items-center justify-center gap-2 flex-1 min-w-0">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className={shuffle ? 'text-accent bg-accent/20' : 'text-muted-foreground hover:text-foreground'} onClick={toggleShuffle} aria-pressed={shuffle} title="Shuffle">
+              <Shuffle className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={playPrevious}><SkipBack className="h-6 w-6" /></Button>
+            <Button size="icon" className="h-12 w-12 rounded-full" style={{ background: '#a78bfa', color: '#232136' }} onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
+              {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={playNext}><SkipForward className="h-6 w-6" /></Button>
+            <Button variant="ghost" size="icon" className={repeat ? 'text-accent bg-accent/20' : 'text-muted-foreground hover:text-foreground'} onClick={toggleRepeat} aria-pressed={repeat} title="Repeat">
+              <Repeat className="h-5 w-5" />
+            </Button>
           </div>
+          <div className="flex items-center gap-2 w-full max-w-lg min-w-0">
+            <span className="text-xs text-muted-foreground tabular-nums">{formatTime(currentTime)}</span>
+            <Slider value={[progress]} max={100} step={1} onValueChange={handleSeek} className="flex-1 min-w-0" />
+            <span className="text-xs text-muted-foreground tabular-nums">{formatTime(duration)}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 w-1/4 justify-end min-w-0">
+          <Volume2 className="h-5 w-5 text-muted-foreground" />
+          <Slider value={[volume * 100]} max={100} step={1} onValueChange={handleVolumeChange} className="w-24 min-w-0" />
         </div>
       </div>
     </div>

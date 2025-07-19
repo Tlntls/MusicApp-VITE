@@ -52,7 +52,7 @@ export default function Artists() {
         id: song.album.id,
         title: song.album.title,
         cover: song.album.cover,
-        year: song.album.year,
+        year: song.album.year, // Ensure year is included
         songs: [],
       };
     }
@@ -66,30 +66,32 @@ export default function Artists() {
   // Remove selectedAlbumId and selectedAlbum state
 
   return (
-    <div className="flex h-full w-full bg-main-bg text-text-light">
+    <div className="flex h-full w-full bg-main-bg text-text-light min-h-0">
       {/* Left pane: artist list */}
-      <aside className="w-64 min-w-[200px] max-w-xs border-r bg-surface-bg h-full overflow-y-auto">
-        <h2 className="text-xl font-bold px-4 py-4">Artists ({artists.length})</h2>
-        <ul className="flex flex-col">
-          {artists.map(artist => (
-            <li key={artist.id}>
-              <button
-                className={`w-full flex items-center gap-3 px-4 py-2 hover:bg-accent/20 transition-colors ${selectedArtistId === artist.id ? 'bg-accent/30 font-bold' : ''}`}
-                onClick={() => setSelectedArtistId(artist.id)}
-              >
-                <img
-                  src={artist.coverArtPath ? `file://${artist.coverArtPath.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
-                  alt={artist.name}
-                  className="rounded-full w-10 h-10 object-cover border border-muted"
-                />
-                <span className="truncate text-left">{artist.name}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      <aside className="w-64 min-w-[180px] max-w-xs border-r bg-surface-bg h-full flex flex-col min-h-0">
+        <h2 className="text-base font-semibold px-3 py-3 tracking-tight">Artists ({artists.length})</h2>
+        <div className="flex-1 min-h-0 overflow-auto">
+          <ul className="flex flex-col gap-0.5">
+            {artists.map(artist => (
+              <li key={artist.id}>
+                <button
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 hover:bg-accent/20 transition-colors text-sm ${selectedArtistId === artist.id ? 'bg-accent/30 font-bold' : ''}`}
+                  onClick={() => setSelectedArtistId(artist.id)}
+                >
+                  <img
+                    src={artist.coverArtPath ? `file://${artist.coverArtPath.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
+                    alt={artist.name}
+                    className="rounded-full w-8 h-8 object-cover border border-muted"
+                  />
+                  <span className="truncate text-left">{artist.name}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </aside>
       {/* Right pane: all albums for selected artist, each with tracklist */}
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 p-4 overflow-auto min-h-0">
         {isLoading ? (
           <div className="p-8 text-white">Loading artist details...</div>
         ) : !selectedArtist ? (
@@ -97,37 +99,37 @@ export default function Artists() {
         ) : (
           <>
             <section>
-              <h3 className="text-2xl font-bold mb-4">Albums</h3>
+              <h3 className="text-lg font-semibold mb-3 tracking-tight">Albums</h3>
               {albums.length === 0 ? (
                 <div className="text-muted-foreground">No albums found for this artist.</div>
               ) : (
-                <div className="flex flex-col gap-12">
+                <div className="flex flex-col gap-6">
                   {albums.map((album: AlbumWithSongs) => (
-                    <div key={album.id} className="flex flex-col md:flex-row gap-8 items-start bg-surface-bg rounded-lg shadow p-6">
+                    <div key={album.id} className="flex flex-col md:flex-row gap-4 items-start bg-surface-bg rounded-lg shadow p-4 overflow-hidden min-w-0">
                       <img
                         src={album.cover ? `file://${album.cover.replace(/\\/g, '/')}` : '/placeholder-cover.png'}
                         alt={album.title}
-                        className="rounded-lg w-40 h-40 object-cover border border-muted shadow-lg mb-4 md:mb-0"
+                        className="rounded-lg w-28 h-28 object-cover border border-muted shadow-lg mb-2 md:mb-0"
                       />
-                      <div className="flex-1 flex flex-col gap-2">
-                        <div className="flex flex-col md:flex-row md:items-end md:gap-4">
-                          <h2 className="text-2xl font-bold font-headline tracking-tight mb-1 md:mb-0">{album.title}</h2>
-                          {album.year && <div className="text-sm text-muted-foreground">{album.year}</div>}
+                      <div className="flex-1 flex flex-col gap-1 min-w-0">
+                        <div className="flex flex-col md:flex-row md:items-end md:gap-3 min-w-0">
+                          <h2 className="text-base font-semibold font-headline tracking-tight mb-0.5 md:mb-0 truncate min-w-0">{album.title}</h2>
+                          {album.year && <div className="text-xs text-muted-foreground">{album.year}</div>}
                           <div className="text-xs text-muted-foreground">{album.songs.length} song{album.songs.length !== 1 ? 's' : ''}</div>
                         </div>
-                        <div className="mt-4">
+                        <div className="mt-2">
                           <ul className="divide-y divide-border rounded-lg overflow-hidden">
                             {album.songs.map((song, idx) => (
                               <li
                                 key={song.id}
-                                className={`flex items-center px-4 py-3 cursor-pointer group transition-colors duration-150 ${idx % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30`}
+                                className={`relative flex items-center px-3 py-1.5 cursor-pointer group transition-colors duration-150 text-sm ${idx % 2 === 0 ? 'bg-surface-bg' : 'bg-main-bg'} hover:bg-accent/30 min-w-0`}
                                 onClick={() => playItem(song, album.songs)}
                               >
-                                <span className="text-muted-foreground text-lg font-mono transition-opacity duration-100 group-hover:opacity-0 w-8 text-right">{idx + 1}</span>
-                                <span className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-100">
-                                  <Play className="h-5 w-5 text-accent" />
+                                <span className="text-muted-foreground text-base font-mono transition-opacity duration-100 group-hover:opacity-0 w-6 text-right">{idx + 1}</span>
+                                <span className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-100 left-3">
+                                  <Play className="h-4 w-4 text-accent" />
                                 </span>
-                                <span className="ml-2 flex-1 truncate">{song.title}</span>
+                                <span className="ml-2 flex-1 truncate min-w-0">{song.title}</span>
                                 <span className="ml-auto text-xs text-muted-foreground font-mono">{Math.floor((song.duration || 0) / 60)}:{((song.duration || 0) % 60).toString().padStart(2, '0')}</span>
                               </li>
                             ))}
